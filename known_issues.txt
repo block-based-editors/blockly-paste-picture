@@ -1,0 +1,8 @@
+Pressing ctrl-v when the textarea is selected will not work.
+Pressing ctrl-z when you want to undo fails
+
+Pinned comments are still closed when a json is load (so also when browser refresh) should be open (pinned).
+
+No support for workspace comments
+Need to make a plugin with a good interface.
+
