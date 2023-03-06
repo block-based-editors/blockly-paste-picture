@@ -34,7 +34,7 @@ function blockPasteFromImageShortcut() {
           
       }
       block.comment.setVisible(true);
-      var textarea = block.comment.foreignObject_.children[0].children[0]
+      var textarea = block.comment.foreignObject.children[0].children[0]
       
       // replace the textarea with a img tag that will be filled from the clipboard
       textarea.outerHTML = '<img id="destination_' + block.id +'"/><div id="paste_error_'+ block.id +'"/>'
