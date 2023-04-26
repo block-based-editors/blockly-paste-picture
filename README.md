@@ -5,3 +5,4 @@ Copy a picture on your clipboard.
 
 Select a block and press ctrl-v
 
+![image](https://user-images.githubusercontent.com/8227977/234593294-d6c03631-806c-413e-8afb-f818b79dcd62.png)
