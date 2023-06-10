@@ -10,7 +10,10 @@ const ctrlW = Blockly.ShortcutRegistry.registry.createSerializedKey(
 Blockly.ShortcutRegistry.registry.unregister(
        Blockly.ShortcutItems.names.PASTE);
 
-function blockPasteFromImageShortcut() {
+function blockPasteFromImageShortcut(workspace) {
+
+  workspace.addChangeListener(picture_comments);
+
   /** @type {!Blockly.ShortcutRegistry.KeyboardShortcut} */
   const pasteShortcut = {
     name: 'paste',
@@ -66,11 +69,6 @@ Blockly.serialization.registry.register(
     clear: clearFn,    // Clear function
     priority: 10,      // Priority
   });
-
-  
-
-
-
 
 function saveFn(workspace)
 {
@@ -137,20 +135,19 @@ function picture_comments(event)
         });
       }) ;
     }
-
   }
 }
 
 function createImageOnBlock(blockId, blob) {
   const destinationImage = document.getElementById("destination_" + blockId);
   destinationImage.src = URL.createObjectURL(blob);
-  destinationImage.onload = function()
+  destinationImage.onload = function() {
     // image is load so size is known resize the bubble to contain the picture
-    {
+  
     const block = workspace.getBlockById(this.id.replace("destination_",""))
     const border_size = Blockly.Bubble.BORDER_WIDTH*2+1;
     block.comment.setBubbleSize( this.naturalWidth+border_size,this.naturalHeight+border_size)
-    }
+  }
 }
 
 function pasteImage(block_id) {
@@ -159,7 +156,6 @@ function pasteImage(block_id) {
     error.innerHTML = ''
 
     if (permission.state === 'denied') {
-      
       error.innerHTML = 'Not allowed to read clipboard.';
       return
     }
@@ -167,7 +163,6 @@ function pasteImage(block_id) {
     navigator.clipboard.read().then((clipboardContents) => {
       for (const item of clipboardContents) {
           if (!item.types.includes('image/png')) {
-              
               error.innerHTML = 'Clipboard contains no image data (png).';
               return
           }
@@ -183,15 +178,10 @@ function pasteImage(block_id) {
               
                 block = workspace.getBlockById(block_id)
                 block.comment.base64 = base64String
-                
-
               }
             }
           )
       }
-        
     })
-
   })
-  
 }
