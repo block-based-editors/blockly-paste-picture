@@ -363,10 +363,6 @@ toolbox = {
  ]
 };
     
-
-
-
-
 // hardcoded till the end
 
 var options = { 
@@ -468,8 +464,8 @@ function start()
   document.getElementById("save").addEventListener("click", saveFile);
   add_load()
 
-  blockPasteFromImageShortcut()
-  workspace.addChangeListener(picture_comments);
+  blockPasteFromImageShortcut(workspace)
+  
 }
 
 function get_json(workspace)
