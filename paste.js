@@ -15,23 +15,23 @@ function blockPasteFromImageShortcut() {
   const pasteShortcut = {
     name: 'paste',
     preconditionFn: function(workspace) {
+      const selected = Blockly.getSelected()
       return !workspace.options.readOnly &&
           !Blockly.Gesture.inProgress() &&
-          Blockly.selected &&
-          Blockly.selected.isDeletable() &&
-          Blockly.selected.isMovable() &&
-          !Blockly.selected.workspace.isFlyout;
+          selected &&
+          selected.isDeletable() &&
+          selected.isMovable() &&
+          !selected.workspace.isFlyout;
     },
     callback: function(workspace, e) {
       // Prevent the default copy behavior,
       // which may beep or otherwise indicate
       // an error due to the lack of a selection.
       e.preventDefault();
-      var block = Blockly.selected
+      var block = Blockly.getSelected()
       if (!block.comment)
       {
           block.setCommentText("The picture does not persist yet...")
-          
       }
       block.comment.setVisible(true);
       var textarea = block.comment.foreignObject.children[0].children[0]
@@ -106,8 +106,7 @@ function clearFn()
     var block = blocks[i]
     if(block.comment && block.comment.base64)
     {
-      block.comment.base64= null
-
+      block.comment.base64 = null
     }
   }
 }
@@ -127,12 +126,14 @@ function picture_comments(event)
           
           }
           block.comment.setVisible(true);
-          var textarea = block.comment.foreignObject_.children[0].children[0]
-      
+
+          var textarea = block.comment.foreignObject.children[0].children[0]
           // replace the textarea with a img tag that will be filled from the clipboard
           textarea.outerHTML = '<img id="destination_' + block.id +'"/><div id="paste_error_'+ block.id +'"/>'
-          var destinationImage = document.getElementById("destination_"+event.blockId)
-          destinationImage.src = URL.createObjectURL(blob);
+          
+          createImageOnBlock(event.blockId, blob);
+          var error = document.getElementById("paste_error_"+ block.id);
+          error.innerHTML = ''
         });
       }) ;
     }
@@ -140,15 +141,17 @@ function picture_comments(event)
   }
 }
 
-
-
-
- 
-
-
-
-
-
+function createImageOnBlock(blockId, blob) {
+  const destinationImage = document.getElementById("destination_" + blockId);
+  destinationImage.src = URL.createObjectURL(blob);
+  destinationImage.onload = function()
+    // image is load so size is known resize the bubble to contain the picture
+    {
+    const block = workspace.getBlockById(this.id.replace("destination_",""))
+    const border_size = Blockly.Bubble.BORDER_WIDTH*2+1;
+    block.comment.setBubbleSize( this.naturalWidth+border_size,this.naturalHeight+border_size)
+    }
+}
 
 function pasteImage(block_id) {
   navigator.permissions.query({ name: 'clipboard-read' }).then((permission) => {
@@ -169,8 +172,8 @@ function pasteImage(block_id) {
               return
           }
           item.getType('image/png').then((blob) => {
-              var destinationImage = document.getElementById("destination_"+block_id)
-              destinationImage.src = URL.createObjectURL(blob);
+              createImageOnBlock(block_id, blob)
+              error.innerHTML=''
 
               var reader = new FileReader();
               reader.readAsDataURL(blob);
@@ -178,8 +181,8 @@ function pasteImage(block_id) {
                 var base64String = reader.result;
                 console.log('Base64 String - ', base64String);
               
-              block = workspace.getBlockById(block_id)
-              block.comment.base64 = base64String
+                block = workspace.getBlockById(block_id)
+                block.comment.base64 = base64String
                 
 
               }
